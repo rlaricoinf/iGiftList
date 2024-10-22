@@ -1,0 +1,70 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.ryy.giftlist</groupId>
+	<artifactId>iGiftList</artifactId>
+	<version>1.0.0</version>
+	<packaging>war</packaging>
+	<name>iGiftList</name>
+	<properties>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
+		<wildfly.version>33.0.0.Final</wildfly.version>
+	</properties>
+
+	<dependencies>
+<!--	para generacion de QR-->
+<!--		<dependency>-->
+<!--			<groupId>com.google.zxing</groupId>-->
+<!--			<artifactId>core</artifactId>-->
+<!--			<version>3.4.1</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.google.zxing</groupId>-->
+<!--			<artifactId>javase</artifactId>-->
+<!--			<version>3.4.1</version>-->
+<!--		</dependency>-->
+
+		<!--	Primefaces-->
+		<dependency>
+			<groupId>org.primefaces</groupId>
+			<artifactId>primefaces</artifactId>
+			<version>14.0.0</version>
+			<classifier>jakarta</classifier> <!-- por defecto primefaces trabaja con javax, por eso especificamos de manera explicita JAKARTA -->
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.primefaces.themes/all-themes -->
+		<!--		<dependency>-->
+		<!--			<groupId>org.primefaces.themes</groupId>-->
+		<!--			<artifactId>all-themes</artifactId>-->
+		<!--			<version>1.0.11</version>-->
+		<!--		</dependency>-->
+
+
+		<!-- Dependencia de Jakarta Faces -->
+		<dependency>
+			<groupId>jakarta.platform</groupId>
+			<artifactId>jakarta.jakartaee-web-api</artifactId>
+			<version>10.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>jakarta.platform</groupId>
+			<artifactId>jakarta.jakartaee-api</artifactId>
+			<version>10.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<finalName>iGiftList</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.3.1</version>
+			</plugin>
+		</plugins>
+	</build>
+</project>
