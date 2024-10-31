@@ -27,7 +27,7 @@ public class LoginBean {
     public void login() {
         FacesContext context = FacesContext.getCurrentInstance();
         if (VALID_CODE.equals(this.code)) {
-            // Crear sesion y guardar el estado de autenticación
+            // Crear sesion y guardar el estado de autenticacion
             HttpSession session = (HttpSession) context.getExternalContext().getSession(true);
             session.setAttribute("isLoggedIn", true);
 
