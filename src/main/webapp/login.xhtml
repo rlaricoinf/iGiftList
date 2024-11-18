@@ -6,32 +6,62 @@
 
 <h:head>
 	<title>Lista de Regalos</title>
-	<h:outputStylesheet>
-        /* Estilos personalizados */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
-            margin: 0;
-            padding: 20px;
-        }
-        .title-panel {
-            text-align: center;
-            padding: 20px;
-            font-size: 2em;
-            color: #3a87ad;
-        }
-    </h:outputStylesheet>
 </h:head>
 
 <h:body>
 	<h:form>
-		<p:panel header="Lista de Regalos" styleClass="title-panel">
-			<h1>Logueate mijo!</h1>
-		</p:panel>
-		
-    <h:outputLabel for="code" value="Ingrese su código:" />
-    <h:inputText id="code" value="#{loginBean.code}" required="true" />
-    <h:commandButton value="Ingresar" action="#{loginBean.login}" />
+		<p:scrollPanel mode="native" >
+			<p:growl id="messages" showDetail="true" />
+			<div class="form-container">
+				<div class="form-header">Registro de Regalos</div>
+				<div class="form-item">
+					<h:outputLabel for="imageGift" value="Imagen del regalo:" />
+					<p:fileUpload id="imageGift"
+						listener="#{loginBean.handleFileUpload}" mode="advanced"
+						update="messages" auto="true">
+						<p:validateFile sizeLimit="3000000"
+							allowTypes="/(\.|\/)(gif|jpeg|jpg|png)$/" />
+					</p:fileUpload>
+				</div>
+
+				<div class="form-item">
+					<h:outputLabel for="giftName" value="Nombre del regalo:" />
+					<p:inputText id="giftName" value="#{loginBean.giftlistDTO.name}"
+						required="true"
+						requiredMessage="El nombre de regalo es obligatorio" />
+				</div>
+
+				<div class="form-item" style="text-align: center;">
+					<p:commandButton value="Guardar" action="#{loginBean.registro}"
+						update="@form" process="@this giftName" icon="pi pi-check"
+						styleClass="ui-button-success" />
+				</div>
+			</div>
+
+			<p:dataTable id="dtGift" widgetVar="dtGift" var="giftRow"
+				value="#{loginBean.lstDTO}" reflow="true"
+				styleClass="products-table" rowKey="#{giftRow.idGiftlistPk}"
+				paginator="true" rows="10" paginatorPosition="bottom">
+
+				<p:column headerText="Número" sortBy="#{giftRow.idGiftlistPk}"
+					filterBy="#{giftRow.idGiftlistPk}">
+					<h:outputText value="#{giftRow.idGiftlistPk}" />
+				</p:column>
+
+				<p:column headerText="Regaloia">
+					<p:graphicImage value="#{giftRow.imageStream}" stream="false"
+						style="max-width: 300px; max-height: 300px;" />
+					<p:graphicImage value="#{loginBean.graphicText}" />
+				</p:column>
+
+				<p:column headerText="Nombre Regalo" sortBy="#{giftRow.name}"
+					filterBy="#{giftRow.name}">
+					<h:outputText value="#{giftRow.name}" />
+				</p:column>
+
+			</p:dataTable>
+		</p:scrollPanel>
 	</h:form>
+
 </h:body>
 </html>
