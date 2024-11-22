@@ -32,18 +32,6 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "giftlist")
-@NamedQueries({
-    @NamedQuery(name = "Giftlist.findAll", query = "SELECT g FROM Giftlist g"),
-    @NamedQuery(name = "Giftlist.findByIdGiftlistPk", query = "SELECT g FROM Giftlist g WHERE g.idGiftlistPk = :idGiftlistPk"),
-    @NamedQuery(name = "Giftlist.findByName", query = "SELECT g FROM Giftlist g WHERE g.name = :name"),
-    @NamedQuery(name = "Giftlist.findByDescription", query = "SELECT g FROM Giftlist g WHERE g.description = :description"),
-    @NamedQuery(name = "Giftlist.findByStateGift", query = "SELECT g FROM Giftlist g WHERE g.stateGift = :stateGift"),
-    @NamedQuery(name = "Giftlist.findByRegisterDate", query = "SELECT g FROM Giftlist g WHERE g.registerDate = :registerDate"),
-    @NamedQuery(name = "Giftlist.findByRegisterIp", query = "SELECT g FROM Giftlist g WHERE g.registerIp = :registerIp"),
-    @NamedQuery(name = "Giftlist.findByRegisterUser", query = "SELECT g FROM Giftlist g WHERE g.registerUser = :registerUser"),
-    @NamedQuery(name = "Giftlist.findByLastModifyDate", query = "SELECT g FROM Giftlist g WHERE g.lastModifyDate = :lastModifyDate"),
-    @NamedQuery(name = "Giftlist.findByLastModifyIp", query = "SELECT g FROM Giftlist g WHERE g.lastModifyIp = :lastModifyIp"),
-    @NamedQuery(name = "Giftlist.findByLastModifyUser", query = "SELECT g FROM Giftlist g WHERE g.lastModifyUser = :lastModifyUser")})
 public class Giftlist implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -60,6 +48,8 @@ public class Giftlist implements Serializable {
     private String name;
     @Column(name = "description")
     private String description;
+    @Column(name = "name_guest_reservation")
+    private String nameGuestForReservation;
     @Column(name = "state_gift")
     private Integer stateGift;
     @Column(name = "register_date")
@@ -120,7 +110,15 @@ public class Giftlist implements Serializable {
         this.description = description;
     }
 
-    public Integer getStateGift() {
+    public String getNameGuestForReservation() {
+		return nameGuestForReservation;
+	}
+
+	public void setNameGuestForReservation(String nameGuestForReservation) {
+		this.nameGuestForReservation = nameGuestForReservation;
+	}
+
+	public Integer getStateGift() {
         return stateGift;
     }
 

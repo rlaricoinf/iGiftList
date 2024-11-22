@@ -22,21 +22,39 @@ import com.ryy.giftlist.utils.Validations;
 
 import jakarta.ejb.Stateless;
 import jakarta.persistence.Query;
+import jakarta.transaction.Transactional;
 
 @Stateless
 public class GiftlistService extends CrudDaoService {
 
+	@Transactional
 	public void registo(GiftlistDTO dto) {
 		// conversion de DTO a Entity
 		Giftlist entity = GiftlistMapper.INSTANCE.toEntity(dto);
 		
-		//entity.setGiftImage(dto.getGiftImage());
-		
 		// Pistas de auditoria
-		entity.setStateGift(StateGiftListEnum.REGISTRADO.getCode());
+		//entity.setStateGift(StateGiftListEnum.REGISTRADO.getCode());
+		entity.setStateGift(StateGiftListEnum.DISPONIBLE.getCode());
 		entity.setRegisterDate(new Date());
 		
 		insert(entity);
+	}
+	
+	@Transactional
+	public void modificar(GiftlistDTO dto) {
+		// conversion de DTO a Entity
+		Giftlist entity = GiftlistMapper.INSTANCE.toEntity(dto);
+		
+		// Pistas de auditoria
+		entity.setLastModifyDate(new Date());
+		
+		update(entity);
+	}
+	
+	@Transactional
+	public void eliminar(GiftlistDTO dto) {
+		Giftlist entity = em.getReference(Giftlist.class, dto.getIdGiftlistPk());
+		em.remove(entity);
 	}
 	
 	public List<GiftlistDTO> getAllList(){
@@ -54,23 +72,8 @@ public class GiftlistService extends CrudDaoService {
 				GiftlistDTO dto;
 				for(Giftlist entity:lstEntity) {
 					dto = GiftlistMapper.INSTANCE.toDTO(entity);
-					
-					byte[] imagenByte = dto.getGiftImage();
-					
-					StreamedContent imageStream = DefaultStreamedContent.builder()
-		                    .stream(() -> new ByteArrayInputStream(imagenByte))
-		                    .contentType("image/png") 
-		                    .name("myImageRlm.png") 
-		                    .build();
-					
-					dto.setImageStream(imageStream);
-					
-					
-//					dto.setImagenBase64(getImageBase64(dto.getGiftImage()));
-//					if(dto.getImagenBase64()!=null) {
-//						System.out.println("::: "+dto.getImagenBase64());
-//					}
-					
+					dto.setImageStream(getGraphicGift(dto.getGiftImage()));
+					dto.setStateGiftText(StateGiftListEnum.get(dto.getStateGift()).getValue());
 					lst.add(dto);
 				}
 				return lst;
@@ -80,6 +83,15 @@ public class GiftlistService extends CrudDaoService {
 		}
 		
 		return null;
+	}
+	
+	public StreamedContent getGraphicGift(byte[] imagenByte) {
+		StreamedContent imageStream = DefaultStreamedContent.builder()
+                .stream(() -> new ByteArrayInputStream(imagenByte))
+                .contentType("image/png") 
+                .name("myImageRlm.png") 
+                .build();
+		return imageStream;
 	}
 	
 	public StreamedContent getGraphicText() {
@@ -107,12 +119,4 @@ public class GiftlistService extends CrudDaoService {
             return null;
         }
     }
-	
-	public String getImageBase64(byte[] imageData) {
-        if (imageData != null) {
-            return "data:image/png;base64," + Base64.getEncoder().encodeToString(imageData);
-        }
-        return null; // Si no hay datos de imagen
-    }
-	
 }

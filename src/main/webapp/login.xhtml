@@ -9,59 +9,182 @@
 </h:head>
 
 <h:body>
-	<h:form>
-		<p:scrollPanel mode="native" >
-			<p:growl id="messages" showDetail="true" />
-			<div class="form-container">
-				<div class="form-header">Registro de Regalos</div>
-				<div class="form-item">
-					<h:outputLabel for="imageGift" value="Imagen del regalo:" />
-					<p:fileUpload id="imageGift"
+	<p:growl id="messages" showDetail="true" />
+
+	<h:form id="formGiftlist">
+		<p:commandButton value="Acceder"
+			action="#{loginBean.preparedToAccessCode}"
+			onclick="PF('dlgLogin').show()" 
+			update="formLogin" process="@this" icon="pi pi-key" />
+
+		<p:outputPanel rendered="#{loginBean.accessToPrivileges}">
+			<h:panelGrid columns="2">
+				<h:outputLabel for="imageGift" value="Imagen del regalo:" />
+				<p:fileUpload id="imageGift"
+					listener="#{loginBean.handleFileUpload}" mode="advanced"
+					update=":messages" auto="true">
+					<p:validateFile sizeLimit="3000000"
+						allowTypes="/(\.|\/)(gif|jpeg|jpg|png)$/" />
+				</p:fileUpload>
+
+				<h:outputLabel for="giftName" value="Nombre del regalo:" />
+				<p:inputText id="giftName" value="#{loginBean.giftlistDTO.name}"
+					required="true"
+					requiredMessage="El nombre de regalo es obligatorio" />
+
+				<p:commandButton value="Limpiar"
+					action="#{loginBean.cleanFormRegister}" update="@form"
+					process="@this" icon="pi pi-trash" />
+				<p:commandButton value="Guardar" action="#{loginBean.registro}"
+					update="@form" process="@this giftName" icon="pi pi-save" />
+			</h:panelGrid>
+		</p:outputPanel>
+
+		<p:dataTable id="dtGift" widgetVar="dtGift" var="giftRow"
+			value="#{loginBean.lstDTO}" reflow="true" styleClass="products-table"
+			rowKey="#{giftRow.idGiftlistPk}" paginator="true" rows="10"
+			paginatorPosition="bottom">
+
+			<p:column headerText="Número" sortBy="#{giftRow.idGiftlistPk}"
+				filterBy="#{giftRow.idGiftlistPk}">
+				<h:outputText value="#{giftRow.idGiftlistPk}" />
+			</p:column>
+
+			<p:column headerText="Regalo">
+				<p:graphicImage value="#{giftRow.imageStream}" stream="false"
+					style="max-width: 77px; max-height: 77px;" />
+			</p:column>
+
+			<p:column headerText="Descripcion Regalo" sortBy="#{giftRow.name}"
+				filterBy="#{giftRow.name}">
+				<h:outputText value="#{giftRow.name}" />
+			</p:column>
+
+			<p:column headerText="Estado" sortBy="#{giftRow.stateGiftText}"
+				filterBy="#{giftRow.stateGiftText}">
+				<h:outputText value="#{giftRow.stateGiftText}" />
+			</p:column>
+
+			<p:column headerText="Acciones">
+				<p:commandButton value="Reservar" action="#{loginBean.antesDeReservar(giftRow)}" 
+					onclick="PF('dlgReservar').show()" update=":formReserva"
+					process="dtGift" icon="pi pi-check-circle" />
+				<p:commandButton value="Modificar" action="#{loginBean.capturarDatosDeFila(giftRow)}"
+					rendered="#{loginBean.accessToPrivileges}" 
+					process="dtGift" update="formModificacion"
+					onclick="PF('dlgModificacion').show()" styleClass="mr-2 ui-button-warning"
+					icon="pi pi-pencil" />
+				<p:commandButton value="Eliminar"
+					action="#{loginBean.eliminar(giftRow)}"
+					rendered="#{loginBean.accessToPrivileges}" process="dtGift"
+					update="@form" styleClass="ui-button-danger" icon="pi pi-trash">
+					<p:confirm header="Mensaje de Confirmación"
+						message="¿Está seguro/a de eliminar este regalo?"
+						icon="pi pi-exclamation-triangle" />
+				</p:commandButton>
+			</p:column>
+
+			<p:column headerText="Invitado"
+				rendered="#{loginBean.accessToPrivileges}"
+				sortBy="#{giftRow.nameGuestForReservation}"
+				filterBy="#{giftRow.nameGuestForReservation}">
+				<h:outputText value="#{giftRow.nameGuestForReservation}" />
+			</p:column>
+
+		</p:dataTable>
+	</h:form>
+
+	<p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
+		responsive="true" width="350">
+		<p:commandButton value="No" type="button"
+			styleClass="ui-confirmdialog-no ui-button-flat" />
+		<p:commandButton value="Sí" type="button"
+			styleClass="ui-confirmdialog-yes" />
+	</p:confirmDialog>
+
+	<p:dialog id="dlgLogin" widgetVar="dlgLogin"
+		header="Acceso Administrativo" minHeight="40" width="350"
+		showEffect="explode" modal="true" closable="true">
+		<h:form id="formLogin">
+			<h:panelGrid columns="2">
+				<p:outputLabel value="Código de Acceso:" />
+				<p:password value="#{loginBean.code}" />
+
+				<p:commandButton value="Acceder" action="#{loginBean.loginAction}"
+					onclick="PF('dlgLogin').hide()" update=":messages :formGiftlist"
+					process="@form" icon="pi pi-key" />
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+
+	<p:dialog id="dlgModificacion" widgetVar="dlgModificacion"
+		header="MODIFICACIÓN DE REGALO" minHeight="40" width="450"
+		showEffect="explode" modal="true" closable="true">
+		<h:form id="formModificacion">
+			<p:outputPanel rendered="#{loginBean.accessToPrivileges}">
+				<p:outputLabel value="Modificación del Regalo" />
+				<h:panelGrid columns="2">
+					<h:outputLabel for="imageGiftMod" value="Imagen del regalo:" />
+					<p:fileUpload id="imageGiftMod"
 						listener="#{loginBean.handleFileUpload}" mode="advanced"
-						update="messages" auto="true">
+						update=":messages" auto="true">
 						<p:validateFile sizeLimit="3000000"
 							allowTypes="/(\.|\/)(gif|jpeg|jpg|png)$/" />
 					</p:fileUpload>
-				</div>
 
-				<div class="form-item">
-					<h:outputLabel for="giftName" value="Nombre del regalo:" />
-					<p:inputText id="giftName" value="#{loginBean.giftlistDTO.name}"
+					<h:outputLabel for="giftNameMod" value="Nombre del regalo:" />
+					<p:inputText id="giftNameMod" value="#{loginBean.giftlistDTO.name}"
 						required="true"
 						requiredMessage="El nombre de regalo es obligatorio" />
-				</div>
 
-				<div class="form-item" style="text-align: center;">
-					<p:commandButton value="Guardar" action="#{loginBean.registro}"
-						update="@form" process="@this giftName" icon="pi pi-check"
-						styleClass="ui-button-success" />
-				</div>
-			</div>
+					<p:commandButton value="Limpiar"
+						action="#{loginBean.cleanFormRegister}" update="@form"
+						process="@this" icon="pi pi-trash" />
+					<p:commandButton value="Modificar" action="#{loginBean.modificar}"
+						update="@form :formGiftlist" process="@this giftNameMod" icon="pi pi-save" />
+				</h:panelGrid>
+			</p:outputPanel>
+		</h:form>
+	</p:dialog>
+	
+	<p:dialog id="dlgReservar" widgetVar="dlgReservar"
+		header="RESERVAR REGALO" minHeight="40" width="450"
+		showEffect="explode" modal="true" closable="true">
+		<h:form id="formReserva">
+			<p:outputPanel rendered="true">
+				<h:panelGrid columns="2">
+					<h:outputLabel for="imageGiftReserv" value="Imagen del regalo:" />
+					<p:outputPanel>
+						<p:graphicImage rendered="#{loginBean.buildImagen}" 
+							value="#{loginBean.giftlistDTO.imageStream}" stream="false"
+							style="max-width: 100px; max-height: 100px;" />
+					</p:outputPanel>
+					
 
-			<p:dataTable id="dtGift" widgetVar="dtGift" var="giftRow"
-				value="#{loginBean.lstDTO}" reflow="true"
-				styleClass="products-table" rowKey="#{giftRow.idGiftlistPk}"
-				paginator="true" rows="10" paginatorPosition="bottom">
+					<h:outputLabel for="giftNameReserv" value="Nombre del regalo:" />
+					<p:inputText id="giftNameReserv" value="#{loginBean.giftlistDTO.name}"
+						disabled="true"
+						required="true"
+						requiredMessage="El nombre de regalo es obligatorio" />
+						
+					<h:outputLabel for="giftNameReserv" value="Nombre(s) de Invitado(s):" />
+					<h:panelGrid columns="1">
+						<p:inputTextarea value="#{loginBean.giftlistDTO.nameGuestForReservation}" 
+							rows="5" cols="30" counter="display" maxlength="200" 
+							required="true" requiredMessage="Tiene que ingresar su nombre o los nombres de los invitados que reservarán este regalo"
+	                        counterTemplate="{0} caracteres restantes." autoResize="true"/>
+	        			<h:outputText id="display" class="block" />
+					</h:panelGrid>
 
-				<p:column headerText="Número" sortBy="#{giftRow.idGiftlistPk}"
-					filterBy="#{giftRow.idGiftlistPk}">
-					<h:outputText value="#{giftRow.idGiftlistPk}" />
-				</p:column>
-
-				<p:column headerText="Regaloia">
-					<p:graphicImage value="#{giftRow.imageStream}" stream="false"
-						style="max-width: 300px; max-height: 300px;" />
-					<p:graphicImage value="#{loginBean.graphicText}" />
-				</p:column>
-
-				<p:column headerText="Nombre Regalo" sortBy="#{giftRow.name}"
-					filterBy="#{giftRow.name}">
-					<h:outputText value="#{giftRow.name}" />
-				</p:column>
-
-			</p:dataTable>
-		</p:scrollPanel>
-	</h:form>
+					<p:commandButton value="Limpiar"
+						action="#{loginBean.cleanFormRegister}" update="@form"
+						process="@this" icon="pi pi-trash" />
+					<p:commandButton value="Reservar" action="#{loginBean.reservar}"
+						update="@form :formGiftlist" process="@this giftNameMod" icon="pi pi-check-circle" />
+				</h:panelGrid>
+			</p:outputPanel>
+		</h:form>
+	</p:dialog>
 
 </h:body>
 </html>

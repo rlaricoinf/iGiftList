@@ -18,6 +18,14 @@ public class GiftlistFacade {
 		service.registo(dto);
 	}
 	
+	public void modificar(GiftlistDTO dto) {
+		service.modificar(dto);
+	}
+	
+	public void eliminar(GiftlistDTO dto) {
+		service.eliminar(dto);
+	}
+	
 	public List<GiftlistDTO> getAllList() {
 		return service.getAllList();
 	}
