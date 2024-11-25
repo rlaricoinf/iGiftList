@@ -44,7 +44,7 @@ public class LoginBean implements Serializable {
 
 	private String code;
 
-	private static final String VALID_CODE = "12345"; // Codigo valido
+	private static final String VALID_CODE = "110824"; // Codigo valido
 
 	@Inject
 	private GiftlistFacade facade;
@@ -56,9 +56,6 @@ public class LoginBean implements Serializable {
 
 	private List<GiftlistDTO> lstDTO;
 
-	private String testVar = ";";
-	private byte[] xxx;
-
 	private boolean accessToPrivileges;
 	private boolean buildImagen;
 
@@ -66,7 +63,6 @@ public class LoginBean implements Serializable {
 	public void init() {
 		giftlistDTO = new GiftlistDTO();
 		lstDTO = facade.getAllList();
-		xxx = testVar.getBytes();
 
 		accessToPrivileges = false;
 		
@@ -107,13 +103,14 @@ public class LoginBean implements Serializable {
 			giftlistDTO.setRegisterIp(getClientIp());
 			facade.registro(giftlistDTO);
 			
-			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Registro Exitosa",
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Registro Exitoso",
 					"Regalo registrado con exito"));
 		} catch (Exception e) {
 			e.printStackTrace();
 			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
 					"Se ha producido un error al intentar registrar el regalo"));
 		}
+		giftlistDTO = new GiftlistDTO();
 		lstDTO = facade.getAllList();
 	}
 	
@@ -128,11 +125,12 @@ public class LoginBean implements Serializable {
 				&& Validations.validateIsNotNull(dto.getStateGift())) {
 			if(dto.getStateGift().equals(StateGiftListEnum.RESERVADO.getCode())) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Accion No permitida",
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Accion No permitida",
 						"Solo puede reservar los regalos que esten en estado: 'DISPONIBLE'"));
 			}else {
 				capturarDatosDeFila(dto);
 				buildImagen = true;
+				PrimeFaces.current().executeScript("PF('dlgReservar').show();");
 			}
 		}
 	}
@@ -151,6 +149,7 @@ public class LoginBean implements Serializable {
 					"Se ha producido un error al intentar modificar el regalo"));
 		}
 		lstDTO = facade.getAllList();
+		giftlistDTO = new GiftlistDTO();
 	}
 	
 	public void reservar() {
@@ -168,6 +167,8 @@ public class LoginBean implements Serializable {
 					"Se ha producido un error al intentar reservar el regalo"));
 		}
 		lstDTO = facade.getAllList();
+		giftlistDTO = new GiftlistDTO();
+		buildImagen = false;
 	}
 	
 	public void eliminar(GiftlistDTO dto) {
@@ -293,14 +294,6 @@ public class LoginBean implements Serializable {
 
 	public void setLstDTO(List<GiftlistDTO> lstDTO) {
 		this.lstDTO = lstDTO;
-	}
-
-	public String getTestVar() {
-		return testVar;
-	}
-
-	public void setTestVar(String testVar) {
-		this.testVar = testVar;
 	}
 
 	public boolean isAccessToPrivileges() {
